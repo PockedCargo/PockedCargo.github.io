@@ -2,6 +2,7 @@
 # the default layout is 'page'
 icon: fas fa-terminal
 order: 4
+title: ~/about
 ---
 
 ```

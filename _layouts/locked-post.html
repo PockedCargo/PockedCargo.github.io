@@ -1,0 +1,71 @@
+---
+layout: post
+---
+
+<div class="gate-wrap" id="gateWrap">
+  <div class="terminal-box">
+    <div class="terminal-box-bar">
+      <span class="tdot r"></span><span class="tdot y"></span><span class="tdot g"></span>
+    </div>
+    <div class="terminal-box-body">
+      <div>$ cat access_status.log</div>
+      <div class="gate-msg">This writeup is access-restricted. Enter the access code to decrypt and view the full investigation.</div>
+      <div class="gate-input-row">
+        <span class="gate-prompt">$</span>
+        <input type="password" id="lockedAccessInput" placeholder="enter access code" autocomplete="off">
+      </div>
+      <button class="gate-unlock-btn" id="lockedUnlockBtn">UNLOCK WRITEUP</button>
+      <div id="lockedStatusLine"></div>
+    </div>
+  </div>
+</div>
+
+<div id="lockedContent" class="locked-content">
+  {{ content }}
+</div>
+
+<script>
+(function(){
+  async function sha256(text){
+    const enc = new TextEncoder().encode(text);
+    const buf = await crypto.subtle.digest('SHA-256', enc);
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // Shared access code for every locked writeup: jimnah2026
+  const CODE_HASH = "8cdd3d1cc7e07e4b2370f800bb2e6218c5035050d8bbbb6530605d5aa693f1fc";
+
+  const input = document.getElementById('lockedAccessInput');
+  const btn = document.getElementById('lockedUnlockBtn');
+  const status = document.getElementById('lockedStatusLine');
+  const gate = document.getElementById('gateWrap');
+  const content = document.getElementById('lockedContent');
+
+  async function tryUnlock(){
+    const code = input.value.trim();
+    if(!code){
+      status.textContent = 'error: access code required';
+      status.className = 'err';
+      return;
+    }
+    status.textContent = 'verifying...';
+    status.className = '';
+    const hash = await sha256(code);
+    if(hash === CODE_HASH){
+      status.textContent = 'access granted — decrypting writeup...';
+      status.className = 'ok';
+      setTimeout(() => {
+        gate.style.display = 'none';
+        content.classList.add('visible');
+        window.scrollTo({top: content.offsetTop - 80, behavior: 'smooth'});
+      }, 450);
+    } else {
+      status.textContent = 'access denied: incorrect code';
+      status.className = 'err';
+    }
+  }
+
+  btn.addEventListener('click', tryUnlock);
+  input.addEventListener('keydown', e => { if(e.key === 'Enter') tryUnlock(); });
+})();
+</script>
