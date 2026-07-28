@@ -98,6 +98,77 @@ const projects: Project[] = [
     ],
   },
   {
+    id: "mangobleed",
+    title: "MangoBleed — MongoDB DFIR Investigation",
+    category: "Digital Forensics",
+    description: "Linux-focused DFIR investigation of a compromised MongoDB synchronization environment. Reconstructed the full attack timeline from UAC triage artifacts — .bash_history, MongoDB logs, and system log correlation.",
+    tags: ["DFIR", "MongoDB", "Linux", "Incident Response", "UAC", "Timeline Analysis"],
+    isHtb: true,
+    htbNote: "HTB Sherlock — unlock to view the full forensic investigation",
+    terminalTitle: "jimnah@forensics:~/mangobleed",
+    terminalLines: [
+      { text: "", type: "dim" },
+      { text: "linux_forensics.sh — MangoBleed Investigation", type: "info" },
+      { text: "Challenge: Linux DFIR — compromised MongoDB sync environment", type: "info" },
+      { text: "Evidence: UAC (Unix-like Artifacts Collector) triage package", type: "info" },
+      { text: "", type: "dim" },
+      { text: "# STEP 1: Examine Triage Package Structure", type: "command" },
+      { text: "ls -la root/ && cat root/collection_info.txt", type: "command" },
+      { text: "[+] UAC collection — Linux system artifacts captured", type: "success" },
+      { text: "[+] Key artifacts: logs, .bash_history, MongoDB files, processes", type: "success" },
+      { text: "", type: "dim" },
+      { text: "# STEP 2: Reconstruct Attacker's Shell History", type: "command" },
+      { text: "cat root/home/mongoadmin/.bash_history", type: "command" },
+      { text: "cd /var/lib/mongodb/", type: "output" },
+      { text: "ls -la", type: "output" },
+      { text: "cd mongodb/", type: "output" },
+      { text: "python3 -m http.server 6969", type: "output" },
+      { text: "", type: "dim" },
+      { text: "[i] Attacker navigated to MongoDB data directory", type: "info" },
+      { text: "[i] Started Python HTTP server on port 6969 — data exfiltration", type: "warning" },
+      { text: "", type: "dim" },
+      { text: "# STEP 3: Verify MongoDB Database Path", type: "command" },
+      { text: "cat root/var/log/mongodb/mongod.log | grep dbPath", type: "command" },
+      { text: "dbPath: \"/var/lib/mongodb\"", type: "output" },
+      { text: "storage:", type: "output" },
+      { text: "  dbPath: \"/var/lib/mongodb\"", type: "output" },
+      { text: "", type: "dim" },
+      { text: "[+] Confirmed: MongoDB database path matches attacker's target", type: "success" },
+      { text: "[!] HTTP server at port 6969 = data staging for exfiltration", type: "warning" },
+      { text: "", type: "dim" },
+      { text: "# STEP 4: Analyze MongoDB Service Behavior", type: "command" },
+      { text: "grep -i 'error\\|warning\\|fail' root/var/log/mongodb/mongod.log | tail -20", type: "command" },
+      { text: "[i] Checking for abnormal service behavior...", type: "info" },
+      { text: "[+] Unexpected MongoDB synchronization activity detected", type: "success" },
+      { text: "[+] Evidence consistent with exploitation of sync service", type: "success" },
+      { text: "", type: "dim" },
+      { text: "# STEP 5: Timeline Reconstruction", type: "command" },
+      { text: "grep -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}' root/var/log/mongodb/mongod.log | head -5", type: "command" },
+      { text: "[i] Mapping events chronologically...", type: "info" },
+      { text: "[+] Suspicious timestamps identified during sync operations", type: "success" },
+      { text: "[+] Service behavior deviated from baseline during exploitation", type: "success" },
+      { text: "", type: "dim" },
+      { text: "# STEP 6: Correlate Multiple Evidence Sources", type: "command" },
+      { text: "grep -l 'mongo\\|6969\\|exfil' root/*.log 2>/dev/null", type: "command" },
+      { text: "[i] Cross-referencing shell history + MongoDB logs + auth records...", type: "info" },
+      { text: "[+] Full attack chain reconstructed:", type: "success" },
+      { text: "  1. Initial access via vulnerable MongoDB sync service (T1190)", type: "output" },
+      { text: "  2. Navigated to database directory at /var/lib/mongodb", type: "output" },
+      { text: "  3. Staged data using python3 HTTP server on port 6969", type: "output" },
+      { text: "  4. Exfiltrated MongoDB collections via HTTP", type: "output" },
+      { text: "", type: "dim" },
+      { text: "# === MITRE ATT&CK MAPPING ===", type: "info" },
+      { text: "T1190 — Exploit Public-Facing Application (MongoDB sync)", type: "output" },
+      { text: "T1005 — Data from Local System (MongoDB collections)", type: "output" },
+      { text: "T1046 — Network Service Discovery", type: "output" },
+      { text: "T1082 — System Information Discovery", type: "output" },
+      { text: "T1070 — Indicator Removal (applicable artifacts)", type: "output" },
+      { text: "", type: "dim" },
+      { text: "[+] STATUS: INVESTIGATION COMPLETE — attack chain documented", type: "success" },
+      { text: "[+] Tools used: grep, cat, less, find, strings on UAC triage", type: "success" },
+    ],
+  },
+  {
     id: "operation-blackout",
     title: "Operation Blackout — Defense Evasion Forensics",
     category: "Digital Forensics",
@@ -300,6 +371,51 @@ const projects: Project[] = [
     ],
   },
   {
+    id: "greenfield-university",
+    title: "Greenfield University — Multi-Campus Network Design",
+    category: "Network Engineering",
+    description: "Full greenfield network architecture design for a multi-campus university. 3 campuses, 8 VLANs, OSPF routing, HSRP failover, and enterprise security controls including 802.1X and port security.",
+    tags: ["Network Design", "VLAN", "OSPF", "Cisco", "HSRP", "802.1X"],
+    isHtb: false,
+    terminalTitle: "jimnah@neteng:~/greenfield",
+    terminalLines: [
+      { text: "", type: "dim" },
+      { text: "cat topology_overview.txt", type: "command" },
+      { text: "Greenfield University — Network Topology v2.0", type: "output" },
+      { text: "3 Campuses | 8 VLANs | 500+ Users | OSPF | HSRP", type: "output" },
+      { text: "", type: "dim" },
+      { text: "show vlan brief", type: "command" },
+      { text: "10  Administration    active  Gi1/0/1-8    10.0.10.0/24", type: "output" },
+      { text: "20  Faculty           active  Gi1/0/9-16   10.0.20.0/24", type: "output" },
+      { text: "30  Students          active  Gi1/0/17-24  10.0.30.0/24", type: "output" },
+      { text: "40  Research Lab      active  Gi2/0/1-8    10.1.40.0/24", type: "output" },
+      { text: "50  Library           active  Gi2/0/9-16   10.1.50.0/24", type: "output" },
+      { text: "99  Management        active  Gi1/0/24     10.0.99.0/24", type: "output" },
+      { text: "", type: "dim" },
+      { text: "show running-config | include router ospf", type: "command" },
+      { text: "router ospf 1", type: "output" },
+      { text: "  network 10.0.0.0 0.0.255.255 area 0", type: "output" },
+      { text: "  network 10.1.0.0 0.0.255.255 area 1", type: "output" },
+      { text: "  network 10.2.0.0 0.0.255.255 area 2", type: "output" },
+      { text: "", type: "dim" },
+      { text: "show ip route | grep -E 'O IA|O\\*E2'", type: "command" },
+      { text: "O IA 10.1.40.0/24 [110/2] via 10.0.99.2", type: "output" },
+      { text: "O*E2 0.0.0.0/0 [110/1] via 10.0.99.254", type: "output" },
+      { text: "", type: "dim" },
+      { text: "# Security configuration:", type: "info" },
+      { text: "ACL: Deny student→admin inter-VLAN traffic", type: "output" },
+      { text: "ACL: Allow RDP only from admin VLAN 10", type: "output" },
+      { text: "Port Security: max 2 MACs per access port", type: "output" },
+      { text: "802.1X: WPA2-Enterprise with RADIUS", type: "output" },
+      { text: "DHCP Snooping + DAI enabled on all VLANs", type: "output" },
+      { text: "", type: "dim" },
+      { text: "[+] OSPF convergence: 12s", type: "success" },
+      { text: "[+] HSRP failover: <3s", type: "success" },
+      { text: "[+] Latency: 2ms intra-campus, 8ms inter-campus", type: "success" },
+      { text: "[+] STATUS: DESIGN COMPLETE — specifications documented", type: "success" },
+    ],
+  },
+  {
     id: "meow-htb",
     title: "Meow — HTB Starting Point",
     category: "Offensive Security",
@@ -424,6 +540,16 @@ export default function ProjectsSection() {
       "redteam-soc": [
         "[!] Multi-threaded scanner caused socket exhaustion on initial implementation",
         "[→] Solved: Implemented connection pooling + rate limiting with configurable thread count",
+      ],
+      "mangobleed": [
+        "[!] UAC triage package did not include /var/lib/mongodb contents — couldn't inspect database files directly",
+        "[→] Solved: Correlated .bash_history with MongoDB logs to confirm the target directory and reconstruct exfiltration method",
+        "[!] MongoDB log timestamps needed correlation across multiple time zones in the triage",
+        "[→] Solved: Used chronological sorting of syslog + auth.log + mongod.log events to build unified timeline",
+      ],
+      "greenfield-university": [
+        "[!] OSPF convergence exceeded 45s on initial design due to flat area configuration",
+        "[→] Solved: Redesigned with multi-area OSPF + route summarization, reduced convergence to 12s",
       ],
       "meow-htb": [
         "[!] Anonymous FTP login initially rejected when connecting from external IP",
@@ -553,6 +679,20 @@ export default function ProjectsSection() {
                               <div>[+] Full technical architecture and implementation details above</div>
                               <div>[+] Code samples and commands are production-ready</div>
                               <div>[+] Design decisions documented inline</div>
+                            </>
+                          )}
+                          {project.id === "mangobleed" && (
+                            <>
+                              <div>[+] Full attack timeline reconstructed from UAC triage artifacts</div>
+                              <div>[+] Attacker exploited MongoDB sync service, exfiltrated via HTTP on 6969</div>
+                              <div>[+] MITRE ATT&CK mapping: T1190, T1005, T1070, T1046, T1082</div>
+                            </>
+                          )}
+                          {project.id === "greenfield-university" && (
+                            <>
+                              <div>[+] Multi-campus network design: 3 campuses, 8 VLANs, OSPF, HSRP</div>
+                              <div>[+] Enterprise security: {'802.1X'}, DHCP snooping, port security, ACLs</div>
+                              <div>[+] OSPF convergence 12s, HSRP failover {'<3s'}</div>
                             </>
                           )}
                           {project.id === "meow-htb" && (
