@@ -1,0 +1,192 @@
+/* DO NOT CHANGE */
+@import "tailwindcss";
+@import "tw-animate-css";
+@custom-variant dark (&:is(.dark *));
+
+/* DO NOT CHANGE */
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: "Inter", "SF Pro", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+}
+
+/* CYBER-MINIMALIST THEME — Ink & Cyan */
+:root {
+  --radius: 0.5rem;
+  --background: #050508;
+  --foreground: #d4d4d4;
+  --card: #08080e;
+  --card-foreground: #d4d4d4;
+  --popover: #08080e;
+  --popover-foreground: #d4d4d4;
+  --primary: #00ff41;
+  --primary-foreground: #050508;
+  --secondary: #0e0e14;
+  --secondary-foreground: #00ff41;
+  --muted: #0e0e14;
+  --muted-foreground: #5a5a5a;
+  --accent: #00d4ff;
+  --accent-foreground: #050508;
+  --destructive: #ff3355;
+  --border: #16161d;
+  --input: #16161d;
+  --ring: #00ff41;
+  --chart-1: #00ff41;
+  --chart-2: #00d4ff;
+  --chart-3: #ffb800;
+  --chart-4: #ff3355;
+  --chart-5: #b000ff;
+  --sidebar: #08080e;
+  --sidebar-foreground: #d4d4d4;
+  --sidebar-primary: #00ff41;
+  --sidebar-primary-foreground: #050508;
+  --sidebar-accent: #00d4ff;
+  --sidebar-accent-foreground: #050508;
+  --sidebar-border: #16161d;
+  --sidebar-ring: #00ff41;
+}
+
+.dark {
+  --background: #050508;
+  --foreground: #d4d4d4;
+  --card: #08080e;
+  --card-foreground: #d4d4d4;
+  --popover: #08080e;
+  --popover-foreground: #d4d4d4;
+  --primary: #00ff41;
+  --primary-foreground: #050508;
+  --secondary: #0e0e14;
+  --secondary-foreground: #00ff41;
+  --muted: #0e0e14;
+  --muted-foreground: #5a5a5a;
+  --accent: #00d4ff;
+  --accent-foreground: #050508;
+  --destructive: #ff3355;
+  --border: #16161d;
+  --input: #16161d;
+  --ring: #00ff41;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", "SF Pro", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  /* Mono for technical elements */
+  code, pre, .font-mono, [class*="font-mono"] {
+    font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", "Consolas", monospace;
+  }
+  button:not([disabled]),
+  [role="button"]:not([disabled]) {
+    cursor: pointer;
+  }
+  ::selection {
+    background: rgba(0, 255, 65, 0.2);
+    color: #00ff41;
+  }
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #050508;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #16161d;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00ff41;
+  }
+}
+
+/* Utility classes */
+.text-terminal-green {
+  color: #00ff41;
+}
+
+.text-terminal-cyan {
+  color: #00d4ff;
+}
+
+.text-terminal-amber {
+  color: #ffb800;
+}
+
+/* True terminal blinking cursor — step-end for hard on/off */
+@keyframes blink-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor {
+  animation: blink-cursor 1s step-end infinite;
+  color: #00ff41;
+}
+
+/* Also works on pseudo-elements */
+.cursor-block::after {
+  content: "█";
+  animation: blink-cursor 1s step-end infinite;
+  color: #00ff41;
+}
+
+/* Subtle terminal prompt */
+.terminal-prompt::before {
+  content: "$ ";
+  color: #00ff41;
+}
+
+/* Hide scrollbar for standalone application feel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Clean divider */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #16161d, transparent);
+  margin: 2rem 0;
+}
