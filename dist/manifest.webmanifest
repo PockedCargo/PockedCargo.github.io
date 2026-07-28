@@ -1,0 +1,17 @@
+{
+  "name": "Jimnah Kabiria — Cybersecurity Portfolio",
+  "short_name": "JK Portfolio",
+  "description": "Cybersecurity student and practitioner documenting digital forensics, incident response, and offensive security investigations",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0f",
+  "theme_color": "#00ff41",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
