@@ -27,8 +27,8 @@ const certifications = [
 ];
 const connectLinks = [
   { label: "GitHub", url: "https://github.com/pockedcargo", icon: ">" },
-  { label: "LinkedIn", url: "#", icon: ">" },
-  { label: "Email", url: "mailto:jimnah@example.com", icon: ">" },
+  { label: "LinkedIn", url: "https://www.linkedin.com/in/jimnah-kabiria-/", icon: ">" },
+  { label: "Email", url: "mailto:jimnahkabiria@gmail.com", icon: ">" },
 ];
 
 /* ─── Marquee Ticker ─── */
@@ -557,8 +557,8 @@ export default function Landing() {
                   <span className="text-[8px] font-mono text-foreground/30 tracking-wider uppercase">/connections</span>
                   <div className="flex items-center gap-3">
                     <a href="https://github.com/pockedcargo" target="_blank" rel="noopener noreferrer" className="text-[9px] font-mono text-foreground/50 hover:text-primary transition-colors duration-200">GH</a>
-                    <a href="#" className="text-[9px] font-mono text-foreground/50 hover:text-primary transition-colors duration-200">LI</a>
-                    <a href="mailto:jimnah@example.com" className="text-[9px] font-mono text-foreground/50 hover:text-primary transition-colors duration-200">@</a>
+                    <a href="https://www.linkedin.com/in/jimnah-kabiria-/" target="_blank" className="text-[9px] font-mono text-foreground/50 hover:text-primary transition-colors duration-200">LI</a>
+                    <a href="mailto:jimnahkabiria@gmail.com" className="text-[9px] font-mono text-foreground/50 hover:text-primary transition-colors duration-200">@</a>
                   </div>
                 </div>
                 <div className="space-y-2 ml-auto">
