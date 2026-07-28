@@ -387,7 +387,7 @@ export default function Landing() {
                                 </span>
                                 {/* Icon inversion arrow */}
                                 <div className="w-6 h-6 rounded-full border border-border/40 flex items-center justify-center transition-all duration-300 group-hover:border-transparent group-hover:bg-primary">
-                                  <span className="text-[9px] text-foreground/30 transition-colors duration-300 group-hover:text-background"> </span>
+                                  <span className="text-[9px] leading-none text-foreground/30 transition-colors duration-300 group-hover:text-background">↗</span>
                                 </div>
                               </div>
                             </div>
