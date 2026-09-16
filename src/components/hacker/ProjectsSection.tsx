@@ -475,6 +475,58 @@ const projects: Project[] = [
     ],
   },
   {
+    id: "management-wants-a-word",
+    title: "Management Wants a Word — DPAPI Credential Chain",
+    category: "Digital Forensics",
+    description: "Full KAPE triage analysis of a Windows laptop, chaining registry secret extraction, DPAPI masterkey decryption, and Chrome credential recovery to unlock a hidden VeraCrypt container — recovering a flag embedded in a decoy invoice PDF.",
+    tags: ["DFIR", "DPAPI", "Windows Registry", "VeraCrypt", "Chrome Forensics", "TryHackMe"],
+    isHtb: true,
+    htbNote: "TryHackMe room — unlock to view the full DPAPI decryption chain",
+    steps: [
+      "dpapi_chain.sh — Management Wants a Word (Hacker Holidays Day 14)",
+      "Evidence: KAPE triage of guest laptop, user 'vera', Room 214",
+      "Objective: recover a password she never meant to leave behind",
+      "",
+      "# STEP 1: Extract Local Account Secrets from Registry Hives",
+      "$ pypykatz registry SYSTEM --sam SAM --security SECURITY",
+      "[+] vera NTLM: 1241186a4aac4f34f4bf7ace71b396a8",
+      "[+] LSA Default Password: minivera",
+      "",
+      "# STEP 2: Generate DPAPI Prekey from Credentials",
+      "$ pypykatz dpapi prekey password <SID> minivera -o prekey_pw.txt",
+      "[+] 4 candidate decryption keys generated",
+      "",
+      "# STEP 3: Decrypt vera's DPAPI Masterkey",
+      "$ pypykatz dpapi masterkey <masterkey_guid> prekey_pw.txt -o masterkey_decrypted.txt",
+      "[+] Masterkey decrypted successfully",
+      "",
+      "# STEP 4: Decrypt Chrome's Saved Login Using the Masterkey",
+      "$ pypykatz dpapi chrome masterkey_decrypted.txt 'Local State' --logindata 'Default/Login Data'",
+      "[+] user: VeraSecretVault  pass: Wh4t1sV3raD0inG0nTh1sH0st",
+      "[+] url: http://bytelotus.thm:8080/login (SecureVault Portal, confirmed in History)",
+      "",
+      "# STEP 5: Identify the Hidden Container",
+      "$ file Documents/backup",
+      "Documents/backup: data",
+      "[!] No file signature — high-entropy random data, classic VeraCrypt fingerprint",
+      "",
+      "# STEP 6: Mount the VeraCrypt Volume",
+      "$ sudo losetup -fP --show Documents/backup",
+      "$ sudo tcplay -m veramap -d /dev/loop0",
+      "Passphrase: Wh4t1sV3raD0inG0nTh1sH0st",
+      "All ok!",
+      "",
+      "# STEP 7: Recover the Flag",
+      "$ pdfimages -all important_invoice_byte_lotus.pdf invoice_img",
+      "[+] Flag hidden in plain sight as an invoice line-item description",
+      "",
+      "=== INVESTIGATION SUMMARY ===",
+      "Flag: THM{1t_w4s_V3r4_A11_Al0ng?!}",
+      "",
+      "[+] STATUS: FULL CREDENTIAL CHAIN RECOVERED — flag captured",
+    ],
+  },
+  {
     id: "the-report",
     title: "The Report — Red Canary Threat Intel Analysis",
     category: "Threat Intelligence",
@@ -685,6 +737,11 @@ export default function ProjectsSection() {
     "meow-htb": [
       ["Anonymous FTP initially rejected from external IP", "Used passive mode (PASV) with explicit TLS negotiation"],
     ],
+    "management-wants-a-word": [
+      ["NTLM-hash-based DPAPI prekey failed to decrypt the masterkey", "Regenerated the prekey from the plaintext LSA password instead, which succeeded"],
+      ["VeraCrypt wasn't packaged in Kali's default repos", "Used tcplay (dm-crypt-based, VeraCrypt-compatible) via a loop device instead of the official VeraCrypt binary"],
+      ["pdftotext returned nothing — the invoice PDF had no real text layer", "Extracted the embedded PNG directly with pdfimages and inspected it visually to find the flag as literal invoice text"],
+    ],
     "the-report": [
       ["Table/diagram data collapsed into unreadable single-character columns under pdftotext", "Cross-checked ambiguous table extracts against the actual PDF page rendering before committing an answer"],
       ["Secondhand write-ups disagreed on the driver CVE (30116 vs 34527)", "Traced the exact 'driver' language back to the PrintNightmare section in the primary source to resolve the conflict"],
@@ -790,6 +847,7 @@ export default function ProjectsSection() {
                       {project.id === "redteam-soc" && (<><div>[+] Multi-threaded scanner: 1000 ports in ~28s</div><div>[+] Elasticsearch/Splunk-compatible JSON output</div></>)}
                       {project.id === "greenfield-university" && (<><div>[+] 3 campuses, 8 VLANs, OSPF, HSRP, 802.1X</div><div>[+] OSPF convergence 12s, HSRP failover &lt;3s</div></>)}
                       {project.id === "meow-htb" && (<><div>[+] HTB Starting Point — anonymous FTP exploitation</div><div>[+] Flag captured directly via FTP, no privesc needed</div></>)}
+                      {project.id === "management-wants-a-word" && (<><div>[+] Full DPAPI chain: registry secrets → masterkey → Chrome credential recovery</div><div>[+] Hidden VeraCrypt volume disguised as a plain extensionless "backup" file</div><div>[+] Flag recovered from a decoy invoice PDF's line-item text, not the file's metadata</div></>)}
                       {project.id === "the-report" && (<><div>[+] 10/10 questions answered from Red Canary's 2022 Threat Detection Report</div><div>[+] Verified every claim against primary source lines (Log4j, ProxyLogon/Shell, PrintNightmare)</div><div>[+] Confirmed T1059 (PowerShell + Cmd Shell) drove 53.4% of customer detections</div></>)}
                       {project.id === "the-report-ii" && (<><div>[+] 15/15 questions answered from MITRE's SOC strategy handbook</div><div>[+] Diagram-only data (Pyramid of Pain, SOC Workflow) required direct PDF page review</div><div>[+] Mapped constituency size (1K–10K users) to Distributed SOC organizational model</div></>)}
                     </div>
