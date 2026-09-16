@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
 import { motion } from "framer-motion";
 import CodeRain from "@/components/hacker/CodeRain";
 import HackerNav from "@/components/hacker/HackerNav";
@@ -248,10 +248,145 @@ function TerminalScanner() {
 
 /* ─── Data for Activity Cards ─── */
 const activityItems = [
-  { title: "Stack Buffer Overflow  Deep Dive Analysis", category: "ADVISORY", meta: "12 MIN READ", date: "28 Jan 2026" },
-  { title: "HTB CyberApocalypse  Forensics Challenge", category: "POCC", meta: "8 MIN READ", date: "15 Jan 2026" },
-  { title: "Zero-Day Assessment  CVE-2024-XXXX Analysis", category: "DISCLOSURE", meta: "15 MIN READ", date: "02 Jan 2026" },
+  { title: "Stack Buffer Overflow  Deep Dive Analysis", category: "ADVISORY", meta: "12 MIN READ", date: "28 Jan 2026", visual: "buffer" },
+  { title: "HTB CyberApocalypse  Forensics Challenge", category: "POCC", meta: "8 MIN READ", date: "15 Jan 2026", visual: "forensics" },
+  { title: "Zero-Day Assessment  CVE-2024-XXXX Analysis", category: "DISCLOSURE", meta: "15 MIN READ", date: "02 Jan 2026", visual: "cve" },
 ];
+
+/* ===== Generative Surveillance Dossier Visuals (Recent Activity) ===== */
+
+function DossierFrame({ tag, children }: { tag: string; children: ReactNode }) {
+  const corner = "absolute w-3 h-3 border-primary/50 pointer-events-none z-10";
+  return (
+    <div className="absolute inset-0">
+      {children}
+      <span className={`${corner} top-2 left-2 border-t border-l`} />
+      <span className={`${corner} top-2 right-2 border-t border-r`} />
+      <span className={`${corner} bottom-2 left-2 border-b border-l`} />
+      <span className={`${corner} bottom-2 right-2 border-b border-r`} />
+      <div className="absolute left-0 right-0 h-px z-10 pointer-events-none"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(0,212,255,0.55), transparent)",
+          boxShadow: "0 0 8px rgba(0,212,255,0.35)",
+          animation: "dossierSweep 3.2s ease-in-out infinite",
+        }} />
+      <div className="absolute bottom-0 inset-x-0 h-6 bg-gradient-to-t from-[#050508] to-transparent pointer-events-none" />
+      <div className="absolute bottom-2 left-3 z-10 font-mono text-[6px] tracking-[0.2em] text-primary/50 select-none">{tag}</div>
+      <div className="absolute bottom-2 right-3 z-10 flex gap-1">
+        {[0, 1, 2].map((d) => (
+          <span key={d} className="w-1 h-1 rounded-full bg-primary/50"
+            style={{ animation: `dossierBlink 1.2s ${d * 0.25}s step-end infinite` }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function BufferVisual() {
+  return (
+    <div className="absolute inset-0 bg-[#07070d] overflow-hidden">
+      <div className="absolute inset-0 opacity-20"
+        style={{ backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 13px, rgba(0,255,65,0.16) 13px, rgba(0,255,65,0.16) 14px)" }} />
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <span className="font-mono text-4xl font-bold text-destructive/[0.08] tracking-widest select-none">41414141</span>
+      </div>
+      <div className="absolute left-2 top-3 w-14 font-mono text-[6px] leading-[10px] text-primary/25 select-none">
+        {Array.from({ length: 12 }, (_, r) => (
+          <div key={r}>{(0x7ffe0000 + r * 16).toString(16).toUpperCase()}</div>
+        ))}
+        <div className="text-destructive/70">7FFE00C0</div>
+      </div>
+      <span className="absolute left-2 bottom-7 font-mono text-[6px] text-primary/40 select-none">ESP --|</span>
+      <div className="absolute right-4 top-5 w-24">
+        {[0, 1, 2, 3, 4, 5].map((r) => (
+          <div key={r} className="h-4 mb-[3px] rounded-sm border relative overflow-hidden"
+            style={{
+              borderColor: r >= 4 ? "rgba(255,51,85,0.75)" : "rgba(0,255,65,0.35)",
+              background: r === 4
+                ? "repeating-linear-gradient(45deg, rgba(255,51,85,0.22) 0 4px, rgba(255,51,85,0.08) 4px 8px)"
+                : r === 5 ? "rgba(255,51,85,0.10)" : "rgba(0,255,65,0.06)",
+            }}>
+            <span className="absolute left-1 top-0.5 font-mono text-[6px] select-none"
+              style={{ color: r >= 4 ? "rgba(255,51,85,0.9)" : "rgba(0,255,65,0.5)" }}>
+              {r >= 4 ? (r === 4 ? "EIP -> 0x41414141" : "SHELLCODE") : `BUF[${r}]`}
+            </span>
+          </div>
+        ))}
+        <span className="block mt-1.5 font-mono text-[7px] tracking-[0.2em] text-destructive/90"
+          style={{ animation: "dossierBlink 1.1s step-end infinite" }}>| OVERFLOW</span>
+      </div>
+    </div>
+  );
+}
+
+function ForensicsVisual() {
+  return (
+    <div className="absolute inset-0 bg-[#07070d] overflow-hidden">
+      <div className="absolute inset-0 p-3 font-mono text-[6px] leading-[10px] select-none">
+        {Array.from({ length: 12 }, (_, r) => (
+          <div key={r} className="flex gap-1.5 whitespace-nowrap">
+            <span className="text-accent/40 shrink-0 w-7">{(0x0500 + r * 16).toString(16).toUpperCase().padStart(6, "0")}</span>
+            {Array.from({ length: 12 }, (_, c) => {
+              const n = (r * 12 + c) * 37 % 256;
+              const flagged = (r * 12 + c) % 17 === 3;
+              const carved = (r * 12 + c) % 23 === 5;
+              return (
+                <span key={c} style={{
+                  color: flagged ? "rgba(255,184,0,0.95)" : carved ? "rgba(0,212,255,0.7)" : "rgba(0,255,65,0.28)",
+                }}>{n.toString(16).padStart(2, "0").toUpperCase()}</span>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+      <div className="absolute left-0 right-0 top-3 h-[10px] bg-white/[0.05] border-y border-primary/10 pointer-events-none"
+        style={{ animation: "dossierRow 2.8s linear infinite" }} />
+      <div className="absolute bottom-6 left-3 right-3 font-mono select-none">
+        <div className="text-[6px] text-accent/50">SECTOR_0500.DMP -- 12 ROWS -- CARVED</div>
+        <div className="text-[7px] text-terminal-amber mt-0.5" style={{ animation: "dossierBlink 1.4s step-end infinite" }}>### FLAG PATTERN @ 0x0B7F</div>
+      </div>
+    </div>
+  );
+}
+
+function CveVisual() {
+  return (
+    <div className="absolute inset-0 bg-[#07070d] overflow-hidden">
+      <div className="absolute inset-0 p-3 font-mono text-[6px] leading-[10px] select-none">
+        <div className="text-destructive font-bold text-[8px] tracking-wider">CVE-2024-XXXX</div>
+        <div className="text-foreground/40 mt-0.5">SEVERITY: <span className="text-destructive/90">CRITICAL</span> / CVSS 9.8</div>
+        <div className="text-foreground/40">VECTOR: AV:N/AC:L/PR:N</div>
+        <div className="h-2" />
+        <div className="text-primary/45">$ gdb ./target.elf</div>
+        <div className="text-primary/45">$ run &lt; pattern.inf</div>
+        <div className="text-primary/45">$ x/4xw $eip</div>
+        <div className="h-2" />
+        <div className="inline-block bg-destructive/15 border border-destructive/40 rounded-sm px-1.5 py-0.5 text-destructive/90 text-[7px]">
+          0x41414141  0x41414141  EIP OVERWRITE
+        </div>
+        <div className="mt-2 text-terminal-amber text-[7px]">
+          | POC COMPILED<span style={{ animation: "dossierBlink 1s step-end infinite" }}>_</span>
+        </div>
+        <div className="mt-0.5 text-primary/40 text-[6px]">STATUS: REPORT DRAFTED -- EMBARGO</div>
+      </div>
+    </div>
+  );
+}
+
+function ActivityVisual({ variant }: { variant?: string }) {
+  return (
+    <>
+      <style>{`
+        @keyframes dossierSweep { 0% { top: 6%; opacity: 0; } 12% { opacity: 1; } 88% { opacity: 1; } 100% { top: 94%; opacity: 0; } }
+        @keyframes dossierRow { 0% { transform: translateY(0); } 100% { transform: translateY(120px); } }
+        @keyframes dossierBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0.15; } }
+      `}</style>
+      {variant === "buffer" && <DossierFrame tag="MEMDMP // PID 1337"><BufferVisual /></DossierFrame>}
+      {variant === "forensics" && <DossierFrame tag="IMG.E01 // AUTOPSY"><ForensicsVisual /></DossierFrame>}
+      {variant === "cve" && <DossierFrame tag="ADVISORY // DRAFT"><CveVisual /></DossierFrame>}
+    </>
+  );
+}
 
 /* ─── Expertise Cards Data ─── */
 const expertiseGrid = [
@@ -352,26 +487,10 @@ export default function Landing() {
                         >
                           {/* Card */}
                           <div className="rounded-xl bg-card overflow-hidden border border-border/40 shadow-[0_4px_24px_rgba(0,0,0,0.3)] hover:shadow-[0_8px_40px_rgba(0,0,0,0.5)] transition-all duration-500">
-                            {/* Visual */}
-                            <div className="aspect-[4/5] relative overflow-hidden">
-                              {/* Grayscale base image */}
-                              <div className="absolute inset-0 grayscale transition-all duration-700 group-hover:grayscale-0 group-hover:scale-105">
-                                <div className={`w-full h-full bg-gradient-to-br ${
-                                  i === 0 ? 'from-slate-800 via-slate-700 to-slate-900' :
-                                  i === 1 ? 'from-slate-900 via-slate-800 to-indigo-950' :
-                                  'from-slate-800 via-slate-900 to-slate-800'
-                                }`}>
-                                  <div className="absolute inset-0 opacity-40"
-                                    style={{ backgroundImage: i === 0
-                                      ? 'radial-gradient(circle at 30% 40%, rgba(0,212,255,0.2) 0%, transparent 50%), repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 21px)'
-                                      : i === 1
-                                      ? 'radial-gradient(circle at 70% 60%, rgba(0,255,65,0.15) 0%, transparent 50%), repeating-linear-gradient(90deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 21px)'
-                                      : 'radial-gradient(circle at 50% 30%, rgba(0,212,255,0.2) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255,184,0,0.1) 0%, transparent 50%)'
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                              <div className="absolute top-3 right-3 text-[8px] font-mono text-foreground/30 tracking-wider">
+                            {/* Visual - generative surveillance dossier */}
+                            <div className="aspect-[4/5] relative overflow-hidden transition-transform duration-700 group-hover:scale-[1.03]">
+                              <ActivityVisual variant={item.visual} />
+                              <div className="absolute top-2.5 left-1/2 -translate-x-1/2 z-10 text-[8px] font-mono text-foreground/40 tracking-wider">
                                 {item.date}
                               </div>
                             </div>
