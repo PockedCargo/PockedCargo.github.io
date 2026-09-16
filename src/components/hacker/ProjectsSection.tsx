@@ -669,9 +669,85 @@ const caseIcons: Record<string, LucideIcon> = {
   "the-report-ii": BookOpen,
 };
 
-function CaseIcon({ id }: { id: string }) {
+// Accent color per case file (theme palette: green / cyan / amber / red)
+const caseAccents: Record<string, string> = {
+  "dream-job": "#ffb800",
+  "mangobleed": "#00d4ff",
+  "phantomcheck": "#00d4ff",
+  "operation-blackout": "#ff3355",
+  "phantom-ring": "#ff3355",
+  "redteam-soc": "#00ff41",
+  "greenfield-university": "#00d4ff",
+  "meow-htb": "#00ff41",
+  "management-wants-a-word": "#ffb800",
+  "the-report": "#ffb800",
+  "the-report-ii": "#00ff41",
+};
+
+const HEX_NOISE = `0x54c0  69 63 6b 00 70 72 69 76 65 73 63 00
+0x54d0  74 72 75 63 74 00 6b 69 6c 6c 62 70 66 00`;
+
+// Evidence-tile placeholder: blueprint grid, viewfinder corners, glowing
+// case icon, hex-noise footer and a scanline sweep on hover.
+function CasePreview({ id, unlocked }: { id: string; unlocked: boolean }) {
   const Icon = caseIcons[id] ?? Folder;
-  return <Icon className="w-3.5 h-3.5 shrink-0 text-primary/70" aria-hidden />;
+  const accent = caseAccents[id] ?? "#00ff41";
+  const corner = "absolute w-2 h-2 pointer-events-none";
+  return (
+    <div
+      className="relative w-20 sm:w-28 shrink-0 self-stretch overflow-hidden border-r border-border/80 bg-[#04040a]"
+      aria-hidden
+    >
+      {/* blueprint grid */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,255,65,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,65,0.05) 1px, transparent 1px)",
+          backgroundSize: "10px 10px",
+        }}
+      />
+      {/* hex noise footer */}
+      <pre
+        className="absolute bottom-1 left-1.5 right-1.5 text-[6px] leading-[7px] font-mono whitespace-pre overflow-hidden select-none"
+        style={{ color: `${accent}2e` }}
+      >
+        {HEX_NOISE}
+      </pre>
+      {/* viewfinder corners */}
+      <span className={`${corner} top-1.5 left-1.5 border-t border-l`} style={{ borderColor: `${accent}88` }} />
+      <span className={`${corner} top-1.5 right-1.5 border-t border-r`} style={{ borderColor: `${accent}88` }} />
+      <span className={`${corner} bottom-1.5 left-1.5 border-b border-l`} style={{ borderColor: `${accent}88` }} />
+      <span className={`${corner} bottom-1.5 right-1.5 border-b border-r`} style={{ borderColor: `${accent}88` }} />
+      {/* icon core */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className="flex items-center justify-center w-11 h-11 rounded-md border bg-background/70 transition-all duration-300"
+          style={{
+            borderColor: `${accent}55`,
+            boxShadow: unlocked ? `0 0 16px ${accent}40, inset 0 0 10px ${accent}26` : "none",
+          }}
+        >
+          <Icon
+            className="w-5 h-5 transition-opacity duration-300"
+            style={{ color: accent, opacity: unlocked ? 1 : 0.5 }}
+          />
+        </div>
+      </div>
+      {/* file extension strip */}
+      <div className="absolute bottom-5 left-0 right-0 text-center">
+        <span className="text-[7px] font-mono tracking-[0.2em]" style={{ color: `${accent}80` }}>.LOG</span>
+      </div>
+      {/* encryption chip */}
+      {!unlocked && (
+        <span className="absolute top-3.5 right-1 z-10 text-[6px] font-mono text-destructive border border-destructive/40 bg-destructive/10 rounded px-1 py-px tracking-wider">
+          ENC
+        </span>
+      )}
+      {/* scanline sweep on hover */}
+      <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-scan-sweep" />
+    </div>
+  );
 }
 
 function StepLine({ line }: { line: string }) {
@@ -809,12 +885,14 @@ export default function ProjectsSection() {
             transition={{ delay: i * 0.03 }}
           >
             <div onClick={() => handleCardClick(project)}
-              className="border border-border rounded-lg bg-card transition-all duration-300 overflow-hidden cursor-pointer hover:border-primary/30"
+              className="group border border-border rounded-lg bg-card transition-all duration-300 overflow-hidden cursor-pointer hover:border-primary/30 hover:bg-[#0a0a10]"
             >
-              <div className="p-3">
+              <div className="flex">
+                <CasePreview id={project.id} unlocked={!!unlocked[project.id]} />
+                <div className="flex-1 min-w-0 p-3">
                 <div className="flex items-start justify-between mb-1.5">
                   <div className="flex items-center gap-2 min-w-0">
-                    <CaseIcon id={project.id} />
+
                     {unlocked[project.id]
                       ? <span className="text-primary shrink-0 text-[10px]">🔓</span>
                       : <span className="text-destructive shrink-0 text-[10px]">🔒</span>}
@@ -838,6 +916,7 @@ export default function ProjectsSection() {
                     {expandedId === project.id ? "collapse" : "expand to view full investigation"}
                   </span>
                   <span className={`text-[8px] transition-transform duration-200 ${expandedId === project.id ? 'rotate-90' : ''}`}>▸</span>
+                </div>
                 </div>
               </div>
 

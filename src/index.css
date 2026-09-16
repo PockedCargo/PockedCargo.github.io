@@ -138,6 +138,18 @@
   }
 }
 
+/* Case-file tile scanline sweep */
+@keyframes scan-sweep {
+  0%   { transform: translateY(-10px); opacity: 0; }
+  12%  { opacity: 0.9; }
+  88%  { opacity: 0.9; }
+  100% { transform: translateY(130px); opacity: 0; }
+}
+
+@utility animate-scan-sweep {
+  animation: scan-sweep 1.5s linear infinite;
+}
+
 /* Utility classes */
 .text-terminal-green {
   color: #00ff41;
