@@ -1,4 +1,4 @@
-import '@vly-ai/integrations';
+﻿import '@vly-ai/integrations';
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
@@ -24,7 +24,7 @@ function RouteLoading() {
   );
 }
 
-/** Silent error boundary — if VlyToolbar crashes it renders nothing instead of
+/** Silent error boundary â€” if VlyToolbar crashes it renders nothing instead of
  *  crashing the whole app (e.g. hook errors in WebContainer environment). */
 class ToolbarErrorBoundary extends React.Component<
   { children: React.ReactNode },
@@ -80,7 +80,12 @@ class RootErrorBoundary extends React.Component<
   }
 }
 
-const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
+// Fall back to the public Convex deployment URL so static builds (e.g. GitHub
+// Pages CI, which has no .env.local) never construct the client with undefined.
+const convex = new ConvexReactClient(
+  (import.meta.env.VITE_CONVEX_URL as string | undefined) ??
+    "https://keen-kudu-394.convex.cloud",
+);
 
 
 
@@ -141,3 +146,4 @@ createRoot(document.getElementById("root")!).render(
     </RootErrorBoundary>
   </StrictMode>,
 );
+
