@@ -1,6 +1,21 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSounds } from "@/hooks/use-sounds";
+import {
+  Target,
+  Database,
+  Ghost,
+  Moon,
+  Bug,
+  Crosshair,
+  GraduationCap,
+  Cat,
+  FileText,
+  Newspaper,
+  BookOpen,
+  Folder,
+  type LucideIcon,
+} from "lucide-react";
 
 interface Project {
   id: string;
@@ -639,6 +654,26 @@ const projects: Project[] = [
 
 const HTB_PASSWORD = "cybersecurity2026";
 
+// Per-case-file icon shown on the card header (falls back to Folder)
+const caseIcons: Record<string, LucideIcon> = {
+  "dream-job": Target,
+  "mangobleed": Database,
+  "phantomcheck": Ghost,
+  "operation-blackout": Moon,
+  "phantom-ring": Bug,
+  "redteam-soc": Crosshair,
+  "greenfield-university": GraduationCap,
+  "meow-htb": Cat,
+  "management-wants-a-word": FileText,
+  "the-report": Newspaper,
+  "the-report-ii": BookOpen,
+};
+
+function CaseIcon({ id }: { id: string }) {
+  const Icon = caseIcons[id] ?? Folder;
+  return <Icon className="w-3.5 h-3.5 shrink-0 text-primary/70" aria-hidden />;
+}
+
 function StepLine({ line }: { line: string }) {
   if (line === "") return <div className="h-2" />;
   if (line.startsWith("$ ")) {
@@ -677,7 +712,7 @@ export default function ProjectsSection() {
       setExpandedId(null);
       return;
     }
-    if (project.isHtb && !unlocked[project.id]) {
+    if (!unlocked[project.id]) {
       setPasswordPrompt(project.id);
       setPasswordInput("");
       setPasswordError(false);
@@ -779,18 +814,20 @@ export default function ProjectsSection() {
               <div className="p-3">
                 <div className="flex items-start justify-between mb-1.5">
                   <div className="flex items-center gap-2 min-w-0">
-                    {project.isHtb && !unlocked[project.id] && <span className="text-destructive shrink-0 text-[10px]">🔒</span>}
-                    {project.isHtb && unlocked[project.id] && <span className="text-primary shrink-0 text-[10px]">🔓</span>}
+                    <CaseIcon id={project.id} />
+                    {unlocked[project.id]
+                      ? <span className="text-primary shrink-0 text-[10px]">🔓</span>
+                      : <span className="text-destructive shrink-0 text-[10px]">🔒</span>}
                     <h3 className="text-[11px] font-mono text-foreground truncate">{project.title}</h3>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                    {project.isHtb && unlocked[project.id] && <span className="text-[8px] font-mono text-primary/70 border border-primary/30 rounded px-1.5 py-0.5">UNLOCKED</span>}
-                    {project.isHtb && !unlocked[project.id] && <span className="text-[8px] font-mono text-destructive/70 border border-destructive/20 rounded px-1.5 py-0.5">LOCKED</span>}
-                    {!project.isHtb && <span className="text-[8px] font-mono text-primary/70 border border-primary/20 rounded px-1.5 py-0.5">OPEN</span>}
+                    {unlocked[project.id]
+                      ? <span className="text-[8px] font-mono text-primary/70 border border-primary/30 rounded px-1.5 py-0.5">UNLOCKED</span>
+                      : <span className="text-[8px] font-mono text-destructive/70 border border-destructive/20 rounded px-1.5 py-0.5">LOCKED</span>}
                   </div>
                 </div>
                 <p className="text-[10px] font-mono text-muted-foreground leading-relaxed mb-2">{project.description}</p>
-                {project.isHtb && !unlocked[project.id] && <p className="text-[9px] font-mono text-destructive/50 italic mb-2">🔒 {project.htbNote}</p>}
+                {!unlocked[project.id] && <p className="text-[9px] font-mono text-destructive/50 italic mb-2">🔒 {project.htbNote ?? "Decryption key required to view the full investigation"}</p>}
                 <div className="flex flex-wrap gap-1">
                   {project.tags.map((tag) => (
                     <span key={tag} className="px-1.5 py-0.5 text-[8px] font-mono bg-secondary border border-border rounded text-muted-foreground">{tag}</span>
@@ -820,7 +857,7 @@ export default function ProjectsSection() {
                       <div>[CASE ID]    <span className="text-accent/80">{project.id.toUpperCase().replace(/-/g, '-')}-2026</span></div>
                       <div>[CLASS]      {project.isHtb ? <span className="text-yellow-400/80">HTB SHERLOCK</span> : <span className="text-primary/80">OPEN SOURCE</span>}</div>
                       <div>[TITLE]      <span className="text-foreground/80">{project.title}</span></div>
-                      <div>[STATUS]     {unlocked[project.id] || !project.isHtb ? <span className="text-primary">DECLASSIFIED</span> : <span className="text-destructive/80">CLASSIFIED</span>}</div>
+                      <div>[STATUS]     {unlocked[project.id] ? <span className="text-primary">DECLASSIFIED</span> : <span className="text-destructive/80">CLASSIFIED</span>}</div>
                     </div>
                   </div>
 
