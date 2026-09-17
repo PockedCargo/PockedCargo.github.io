@@ -1,6 +1,21 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSounds } from "@/hooks/use-sounds";
+import {
+  Target,
+  Database,
+  Ghost,
+  Moon,
+  Bug,
+  Crosshair,
+  GraduationCap,
+  Cat,
+  FileText,
+  Newspaper,
+  BookOpen,
+  Folder,
+  type LucideIcon,
+} from "lucide-react";
 
 interface Project {
   id: string;
@@ -639,6 +654,102 @@ const projects: Project[] = [
 
 const HTB_PASSWORD = "cybersecurity2026";
 
+// Per-case-file icon shown on the card header (falls back to Folder)
+const caseIcons: Record<string, LucideIcon> = {
+  "dream-job": Target,
+  "mangobleed": Database,
+  "phantomcheck": Ghost,
+  "operation-blackout": Moon,
+  "phantom-ring": Bug,
+  "redteam-soc": Crosshair,
+  "greenfield-university": GraduationCap,
+  "meow-htb": Cat,
+  "management-wants-a-word": FileText,
+  "the-report": Newspaper,
+  "the-report-ii": BookOpen,
+};
+
+// Accent color per case file (theme palette: green / cyan / amber / red)
+const caseAccents: Record<string, string> = {
+  "dream-job": "#ffb800",
+  "mangobleed": "#00d4ff",
+  "phantomcheck": "#00d4ff",
+  "operation-blackout": "#ff3355",
+  "phantom-ring": "#ff3355",
+  "redteam-soc": "#00ff41",
+  "greenfield-university": "#00d4ff",
+  "meow-htb": "#00ff41",
+  "management-wants-a-word": "#ffb800",
+  "the-report": "#ffb800",
+  "the-report-ii": "#00ff41",
+};
+
+const HEX_NOISE = `0x54c0  69 63 6b 00 70 72 69 76 65 73 63 00
+0x54d0  74 72 75 63 74 00 6b 69 6c 6c 62 70 66 00`;
+
+// Evidence-tile placeholder: blueprint grid, viewfinder corners, glowing
+// case icon, hex-noise footer and a scanline sweep on hover.
+function CasePreview({ id, unlocked }: { id: string; unlocked: boolean }) {
+  const Icon = caseIcons[id] ?? Folder;
+  const accent = caseAccents[id] ?? "#00ff41";
+  const corner = "absolute w-2 h-2 pointer-events-none";
+  return (
+    <div
+      className="relative w-20 sm:w-28 shrink-0 self-stretch overflow-hidden border-r border-border/80 bg-[#04040a]"
+      aria-hidden
+    >
+      {/* blueprint grid */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(0,255,65,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,255,65,0.05) 1px, transparent 1px)",
+          backgroundSize: "10px 10px",
+        }}
+      />
+      {/* hex noise footer */}
+      <pre
+        className="absolute bottom-1 left-1.5 right-1.5 text-[6px] leading-[7px] font-mono whitespace-pre overflow-hidden select-none"
+        style={{ color: `${accent}2e` }}
+      >
+        {HEX_NOISE}
+      </pre>
+      {/* viewfinder corners */}
+      <span className={`${corner} top-1.5 left-1.5 border-t border-l`} style={{ borderColor: `${accent}88` }} />
+      <span className={`${corner} top-1.5 right-1.5 border-t border-r`} style={{ borderColor: `${accent}88` }} />
+      <span className={`${corner} bottom-1.5 left-1.5 border-b border-l`} style={{ borderColor: `${accent}88` }} />
+      <span className={`${corner} bottom-1.5 right-1.5 border-b border-r`} style={{ borderColor: `${accent}88` }} />
+      {/* icon core */}
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div
+          className="flex items-center justify-center w-11 h-11 rounded-md border bg-background/70 transition-all duration-300"
+          style={{
+            borderColor: `${accent}55`,
+            boxShadow: unlocked ? `0 0 16px ${accent}40, inset 0 0 10px ${accent}26` : "none",
+          }}
+        >
+          <Icon
+            className="w-5 h-5 transition-opacity duration-300"
+            style={{ color: accent, opacity: unlocked ? 1 : 0.5 }}
+          />
+        </div>
+      </div>
+      {/* file extension strip */}
+      <div className="absolute bottom-5 left-0 right-0 text-center">
+        <span className="text-[7px] font-mono tracking-[0.2em]" style={{ color: `${accent}80` }}>.LOG</span>
+      </div>
+      {/* encryption chip */}
+      {!unlocked && (
+        <span className="absolute top-3.5 right-1 z-10 text-[6px] font-mono text-destructive border border-destructive/40 bg-destructive/10 rounded px-1 py-px tracking-wider">
+          ENC
+        </span>
+      )}
+      {/* scanline sweep on hover */}
+      <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-0 group-hover:opacity-100 group-hover:animate-scan-sweep" />
+    </div>
+  );
+}
+
 function StepLine({ line }: { line: string }) {
   if (line === "") return <div className="h-2" />;
   if (line.startsWith("$ ")) {
@@ -677,7 +788,7 @@ export default function ProjectsSection() {
       setExpandedId(null);
       return;
     }
-    if (project.isHtb && !unlocked[project.id]) {
+    if (!unlocked[project.id]) {
       setPasswordPrompt(project.id);
       setPasswordInput("");
       setPasswordError(false);
@@ -774,23 +885,27 @@ export default function ProjectsSection() {
             transition={{ delay: i * 0.03 }}
           >
             <div onClick={() => handleCardClick(project)}
-              className="border border-border rounded-lg bg-card transition-all duration-300 overflow-hidden cursor-pointer hover:border-primary/30"
+              className="group border border-border rounded-lg bg-card transition-all duration-300 overflow-hidden cursor-pointer hover:border-primary/30 hover:bg-[#0a0a10]"
             >
-              <div className="p-3">
+              <div className="flex">
+                <CasePreview id={project.id} unlocked={!!unlocked[project.id]} />
+                <div className="flex-1 min-w-0 p-3">
                 <div className="flex items-start justify-between mb-1.5">
                   <div className="flex items-center gap-2 min-w-0">
-                    {project.isHtb && !unlocked[project.id] && <span className="text-destructive shrink-0 text-[10px]">🔒</span>}
-                    {project.isHtb && unlocked[project.id] && <span className="text-primary shrink-0 text-[10px]">🔓</span>}
+
+                    {unlocked[project.id]
+                      ? <span className="text-primary shrink-0 text-[10px]">🔓</span>
+                      : <span className="text-destructive shrink-0 text-[10px]">🔒</span>}
                     <h3 className="text-[11px] font-mono text-foreground truncate">{project.title}</h3>
                   </div>
                   <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                    {project.isHtb && unlocked[project.id] && <span className="text-[8px] font-mono text-primary/70 border border-primary/30 rounded px-1.5 py-0.5">UNLOCKED</span>}
-                    {project.isHtb && !unlocked[project.id] && <span className="text-[8px] font-mono text-destructive/70 border border-destructive/20 rounded px-1.5 py-0.5">LOCKED</span>}
-                    {!project.isHtb && <span className="text-[8px] font-mono text-primary/70 border border-primary/20 rounded px-1.5 py-0.5">OPEN</span>}
+                    {unlocked[project.id]
+                      ? <span className="text-[8px] font-mono text-primary/70 border border-primary/30 rounded px-1.5 py-0.5">UNLOCKED</span>
+                      : <span className="text-[8px] font-mono text-destructive/70 border border-destructive/20 rounded px-1.5 py-0.5">LOCKED</span>}
                   </div>
                 </div>
                 <p className="text-[10px] font-mono text-muted-foreground leading-relaxed mb-2">{project.description}</p>
-                {project.isHtb && !unlocked[project.id] && <p className="text-[9px] font-mono text-destructive/50 italic mb-2">🔒 {project.htbNote}</p>}
+                {!unlocked[project.id] && <p className="text-[9px] font-mono text-destructive/50 italic mb-2">🔒 {project.htbNote ?? "Decryption key required to view the full investigation"}</p>}
                 <div className="flex flex-wrap gap-1">
                   {project.tags.map((tag) => (
                     <span key={tag} className="px-1.5 py-0.5 text-[8px] font-mono bg-secondary border border-border rounded text-muted-foreground">{tag}</span>
@@ -801,6 +916,7 @@ export default function ProjectsSection() {
                     {expandedId === project.id ? "collapse" : "expand to view full investigation"}
                   </span>
                   <span className={`text-[8px] transition-transform duration-200 ${expandedId === project.id ? 'rotate-90' : ''}`}>▸</span>
+                </div>
                 </div>
               </div>
 
@@ -820,7 +936,7 @@ export default function ProjectsSection() {
                       <div>[CASE ID]    <span className="text-accent/80">{project.id.toUpperCase().replace(/-/g, '-')}-2026</span></div>
                       <div>[CLASS]      {project.isHtb ? <span className="text-yellow-400/80">HTB SHERLOCK</span> : <span className="text-primary/80">OPEN SOURCE</span>}</div>
                       <div>[TITLE]      <span className="text-foreground/80">{project.title}</span></div>
-                      <div>[STATUS]     {unlocked[project.id] || !project.isHtb ? <span className="text-primary">DECLASSIFIED</span> : <span className="text-destructive/80">CLASSIFIED</span>}</div>
+                      <div>[STATUS]     {unlocked[project.id] ? <span className="text-primary">DECLASSIFIED</span> : <span className="text-destructive/80">CLASSIFIED</span>}</div>
                     </div>
                   </div>
 
