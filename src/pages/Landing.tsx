@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef, type ReactNode } from "react";
+import GlitchText from "@/components/hacker/GlitchText";
 import { motion } from "framer-motion";
 import CodeRain from "@/components/hacker/CodeRain";
 import HackerNav from "@/components/hacker/HackerNav";
@@ -445,9 +446,7 @@ export default function Landing() {
                       <span className="text-primary text-lg">_</span>
                       <span className="text-sm font-mono text-foreground">Jimnah<span className="text-accent">.</span></span>
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-bold text-foreground font-mono tracking-tight leading-none mb-3">
-                      Jimnah Kabiria
-                    </h1>
+                    <GlitchText as="h1" text="Jimnah Kabiria" className="text-5xl md:text-7xl font-bold text-foreground font-mono tracking-tight leading-none mb-3" />
                     <div className="text-xs md:text-sm font-mono text-foreground/70 tracking-[0.08em] mb-4">
                       Security Analyst <span className="text-border mx-1">|</span> Penetration Tester <span className="text-border mx-1">|</span> CTF Player
                     </div>
@@ -501,9 +500,7 @@ export default function Landing() {
                                 {item.title}
                               </h3>
                               <div className="flex items-center justify-between">
-                                <span className="text-[8px] font-mono text-slate-500 tracking-[0.15em] uppercase">
-                                  {item.category} <span className="text-foreground/20 mx-1"> </span> {item.meta}
-                                </span>
+                                <span className="flex items-center gap-1.5"><span className="px-1.5 py-px rounded-sm border font-mono text-[7px] tracking-[0.18em]" style={{ color: item.category === "ADVISORY" ? "rgba(255,51,85,0.9)" : item.category === "POCC" ? "rgba(0,212,255,0.95)" : "rgba(255,184,0,0.95)", borderColor: item.category === "ADVISORY" ? "rgba(255,51,85,0.4)" : item.category === "POCC" ? "rgba(0,212,255,0.4)" : "rgba(255,184,0,0.4)" }}>{item.category}</span><span className="text-[8px] font-mono text-slate-500 tracking-[0.15em] uppercase">{item.meta}</span></span>
                                 {/* Icon inversion arrow */}
                                 <div className="w-6 h-6 rounded-full border border-border/40 flex items-center justify-center transition-all duration-300 group-hover:border-transparent group-hover:bg-primary">
                                   <span className="text-[9px] leading-none text-foreground/30 transition-colors duration-300 group-hover:text-background">↗</span>
